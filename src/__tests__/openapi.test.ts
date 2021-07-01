@@ -1,4 +1,4 @@
-import { apiSpecFrom, lambdaHttpEventsFrom } from '../openapi';
+import { apiSpecFrom, lambdaHttpEventsFrom, makeHttpEventRequest } from '../openapi';
 
 describe('apiSpecFrom', () => {
   test('retrieves ApiSpec from OpenAPI V3', async () => {
@@ -65,6 +65,13 @@ describe('lambdaHttpEventsFrom', () => {
   test('collect http events from api spec', () => {
     const apiSpec = {
       '/users/{userId}': {
+        parameters: [
+          {
+            in: 'path',
+            name: 'userId',
+            required: true,
+          }
+        ],
         get: {
           lambda: {
             name: 'getUser',
@@ -87,7 +94,14 @@ describe('lambdaHttpEventsFrom', () => {
           http: {
             path: '/users/{userId}',
             method: 'get',
-            authorizer: 'aws_iam'
+            authorizer: 'aws_iam',
+            request: {
+              parameters: {
+                paths: {
+                  'userId': true
+                }
+              }
+            }
           }
         }
       ],
@@ -102,3 +116,98 @@ describe('lambdaHttpEventsFrom', () => {
     })
   })
 });
+
+describe('makeHttpEventRequest', () => {
+  test('"path" should set in "paths"', () => {
+    const apiSpec = {
+      '/users/{userId}': {
+        parameters: [
+          {
+            in: 'path',
+            name: 'userId',
+            required: true,
+          }
+        ],
+        get: {
+          lambda: {
+            name: 'getUser',
+            params: { authorizer: 'aws_iam' }
+          },
+        },
+      }
+    };
+
+    const ret = makeHttpEventRequest(apiSpec['/users/{userId}'], 'get');
+
+    expect(ret).toEqual({
+      parameters: {
+        paths: {
+          userId: true
+        }
+      }
+    })
+  });
+
+  test('requestBody should set in schema', () => {
+    const apiSpec = {
+      '/users': {
+        post: {
+          lambda: {
+            name: 'createUser',
+            params: {}
+          },
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
+                    email: { type: 'string' },
+                    dateOfBirth: { type: 'string', format: 'date' }
+                  },
+                  required: [ 'firstName', 'lastName', 'email', 'dateOfBirth' ]
+                },
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const ret = makeHttpEventRequest(apiSpec['/users'], 'post');
+
+    expect(ret).toEqual({
+      schema: {
+        'application/json': {
+          type: 'object',
+          properties: {
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            email: { type: 'string' },
+            dateOfBirth: { type: 'string', format: 'date' }
+          },
+          required: [ 'firstName', 'lastName', 'email', 'dateOfBirth' ]
+        }
+      }
+    })
+  });
+
+  test('returns undefined when no parameters and no requestBody', () => {
+    const apiSpec = {
+      '/users': {
+        get: {
+          lambda: {
+            name: 'getUser',
+            params: { authorizer: 'aws_iam' }
+          },
+        },
+      }
+    };
+
+    const ret = makeHttpEventRequest(apiSpec['/users'], 'get');
+
+    expect(ret).toBeUndefined();
+  })
+})

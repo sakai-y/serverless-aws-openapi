@@ -9,44 +9,48 @@ export interface LambdaSpec {
 export const HttpMethods = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'] as const;
 export type HttpMethod = typeof HttpMethods[number];
 
-export interface Parameter {
+export interface ParameterSpec {
   name: string;
   in: string;
   required?: boolean;
 };
 
-export interface RequestBody {
+export interface RequestBodySpec {
   content: {
     [media: string]: {
-      schema?: any;
+      schema?: unknown;
     };
   };
   required?: boolean;
 };
 
-export interface Operation {
+export interface OperationSpec {
   lambda?: {
     name: string;
-    params: {
-      [key: string]: unknown;
-    }
+    params: Record<string, unknown>;
   };
-  parameters?: Parameter[];
-  requestBody?: RequestBody;
+  parameters?: ParameterSpec[];
+  requestBody?: RequestBodySpec;
 };
 
 export interface ApiSpec {
   [path: string]: {
-    parameters?: Parameter[];
+    parameters?: ParameterSpec[];
   } & {
-    [method in HttpMethod]?: Operation;
+    [method in HttpMethod]?: OperationSpec;
   };
 };
 
-export interface HttpEvent {
+export type ApigwRequestParameters = Record<'querystrings'|'headers'|'paths', Record<string, boolean>>;
+
+export interface ApigwHttpEvent {
   http: {
     path: string;
     method: HttpMethod;
+    request?: {
+      parameters?: ApigwRequestParameters;
+      schema?: Record<string, unknown>;
+    };
     [key: string]: unknown;
   }
 }
