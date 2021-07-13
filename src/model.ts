@@ -49,7 +49,7 @@ export interface ApigwHttpEvent {
     method: HttpMethod;
     request?: {
       parameters?: ApigwRequestParameters;
-      schema?: Record<string, unknown>;
+      schemas?: Record<string, unknown>;
     };
     [key: string]: unknown;
   }

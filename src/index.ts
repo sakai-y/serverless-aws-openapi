@@ -31,6 +31,14 @@ class ServerlessAwsOpenapi {
       }
       func.events = events;
 
+      // set 'schemas' to 'schema' for Serverless <2.28
+      events.forEach(event => {
+        const schema = event.http.request?.schemas;
+        if (schema) {
+          (event.http.request as any).schema = schema;
+        }
+      })
+
       const routes = events.map(event => `${event.http.method} ${event.http.path}`);
       cli.log(`OpenAPI - added route to ${funcName}: ${routes}`);
     });

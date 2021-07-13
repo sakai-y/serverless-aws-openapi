@@ -148,7 +148,7 @@ describe('makeHttpEventRequest', () => {
     })
   });
 
-  test('requestBody should set in schema', () => {
+  test('requestBody should set in schemas', () => {
     const apiSpec = {
       '/users': {
         post: {
@@ -179,7 +179,7 @@ describe('makeHttpEventRequest', () => {
     const ret = makeHttpEventRequest(apiSpec['/users'], 'post');
 
     expect(ret).toEqual({
-      schema: {
+      schemas: {
         'application/json': {
           type: 'object',
           properties: {

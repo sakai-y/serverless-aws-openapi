@@ -61,7 +61,7 @@ export function makeHttpEventRequest(item: ApiSpec[string], method: HttpMethod):
     return params;
   }, {} as ApigwRequestParameters);
 
-  const schema = ensureNotEmpty(Object.entries(item[method]?.requestBody?.content ?? {}).reduce((contents, [media, content]) => {
+  const schemas = ensureNotEmpty(Object.entries(item[method]?.requestBody?.content ?? {}).reduce((contents, [media, content]) => {
     if (content.schema) {
       contents[media] = content.schema;
       // (contents[media] as any).$schema = "http://json-schema.org/draft-04/schema#";
@@ -69,13 +69,13 @@ export function makeHttpEventRequest(item: ApiSpec[string], method: HttpMethod):
     return contents;
   }, {} as Record<string, unknown>));
 
-  if (!parameters && !schema) {
+  if (!parameters && !schemas) {
     return undefined;
   }
 
   return {
     parameters,
-    schema
+    schemas
   };
 }
 
