@@ -15,6 +15,12 @@
   },
   "author": "Yoshihito SAKAI",
   "license": "MIT",
+  "keywords": [
+    "serverless",
+    "serverless plugin",
+    "aws",
+    "openapi"
+  ],
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.0.2",
     "lodash": "^4.17.21"
