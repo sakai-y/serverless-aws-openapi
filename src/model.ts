@@ -41,7 +41,7 @@ export interface ApiSpec {
   };
 };
 
-export type ApigwRequestParameters = Record<'querystrings'|'headers'|'paths', Record<string, boolean>>;
+export type ApigwRequestParameters = Partial<Record<'querystrings' | 'headers' | 'paths', Record<string, boolean>>>;
 
 export interface ApigwHttpEvent {
   http: {

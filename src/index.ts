@@ -1,5 +1,4 @@
 import Serverless from 'serverless';
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { apiSpecFrom, lambdaHttpEventsFrom } from './openapi';
 
 class ServerlessAwsOpenapi {
@@ -31,15 +30,22 @@ class ServerlessAwsOpenapi {
       }
       func.events = events;
 
-      // set 'schemas' to 'schema' for Serverless <2.28
-      events.forEach(event => {
+      events.forEach((event) => {
         const schema = event.http.request?.schemas;
         if (schema) {
+          const medias = Object.keys(schema);
+          if (medias.length === 1) {
+            // change only one media to '$default' to force APIGW to validate body
+            schema['$default'] = schema[medias[0]];
+            delete schema[medias[0]];
+          }
+
+          // set 'schemas' to 'schema' for Serverless <2.28
           (event.http.request as any).schema = schema;
         }
-      })
+      });
 
-      const routes = events.map(event => `${event.http.method} ${event.http.path}`);
+      const routes = events.map((event) => `${event.http.method} ${event.http.path}`);
       cli.log(`OpenAPI - added route to ${funcName}: ${routes}`);
     });
   }

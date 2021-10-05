@@ -56,7 +56,7 @@ export function makeHttpEventRequest(item: ApiSpec[string], method: HttpMethod):
       if (!params[location]) {
         params[location] = {};
       }
-      params[location][param.name] = param.required ?? false;
+      (params[location] as Record<string, boolean>)[param.name] = param.required ?? false;
     }
     return params;
   }, {} as ApigwRequestParameters);
