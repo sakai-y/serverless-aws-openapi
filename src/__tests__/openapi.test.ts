@@ -33,25 +33,12 @@ describe('apiSpecFrom', () => {
               'application/json': {
                 schema: {
                   type: 'object',
+                  title: 'example',
                   properties: {
-                    firstName: { type: 'string' },
-                    lastName: { type: 'string' },
-                    email: { type: 'string' },
-                    dateOfBirth: { type: 'string', format: 'date' }
+                    id: { type: 'string' },
                   },
-                  required: [ 'firstName', 'lastName', 'email', 'dateOfBirth' ]
                 },
-                examples: {
-                  'Create User Bob Fellow': {
-                    value: {
-                      firstName: 'Bob',
-                      lastName: 'Fellow',
-                      email: 'bob.fellow@gmail.com',
-                      dateOfBirth: '1996-08-24'
-                    }
-                  }
-                }
-              }
+              },
             },
             required: undefined,
           }
