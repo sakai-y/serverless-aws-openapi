@@ -11,13 +11,13 @@ describe('apiSpecFrom', () => {
             name: 'userId',
             in: 'path',
             required: true,
-            description: 'Id of an existing user.'
-          }
+            description: 'Id of an existing user.',
+          },
         ],
         get: {
           lambda: {
             name: 'getUser',
-            params: { authorizer: 'aws_iam' }
+            params: { authorizer: 'aws_iam' },
           },
           parameters: undefined,
           requestBody: undefined,
@@ -41,11 +41,11 @@ describe('apiSpecFrom', () => {
               },
             },
             required: undefined,
-          }
-        }
-      }
-    })
-  })
+          },
+        },
+      },
+    });
+  });
 });
 
 describe('lambdaHttpEventsFrom', () => {
@@ -57,26 +57,26 @@ describe('lambdaHttpEventsFrom', () => {
             in: 'path',
             name: 'userId',
             required: true,
-          }
+          },
         ],
         get: {
           lambda: {
             name: 'getUser',
-            params: { authorizer: 'aws_iam' }
+            params: { authorizer: 'aws_iam' },
           },
         },
       },
       '/user': {
         post: {
           lambda: { name: 'updateUser', params: {} },
-        }
-      }
+        },
+      },
     };
 
     const ret = lambdaHttpEventsFrom(apiSpec);
 
     expect(ret).toEqual({
-      'getUser': [
+      getUser: [
         {
           http: {
             path: '/users/{userId}',
@@ -85,23 +85,23 @@ describe('lambdaHttpEventsFrom', () => {
             request: {
               parameters: {
                 paths: {
-                  'userId': true
-                }
-              }
-            }
-          }
-        }
+                  userId: true,
+                },
+              },
+            },
+          },
+        },
       ],
-      'updateUser': [
+      updateUser: [
         {
           http: {
             path: '/user',
-            method: 'post'
-          }
-        }
-      ]
-    })
-  })
+            method: 'post',
+          },
+        },
+      ],
+    });
+  });
 });
 
 describe('makeHttpEventRequest', () => {
@@ -113,15 +113,15 @@ describe('makeHttpEventRequest', () => {
             in: 'path',
             name: 'userId',
             required: true,
-          }
+          },
         ],
         get: {
           lambda: {
             name: 'getUser',
-            params: { authorizer: 'aws_iam' }
+            params: { authorizer: 'aws_iam' },
           },
         },
-      }
+      },
     };
 
     const ret = makeHttpEventRequest(apiSpec['/users/{userId}'], 'get');
@@ -129,10 +129,10 @@ describe('makeHttpEventRequest', () => {
     expect(ret).toEqual({
       parameters: {
         paths: {
-          userId: true
-        }
-      }
-    })
+          userId: true,
+        },
+      },
+    });
   });
 
   test('requestBody should set in schemas', () => {
@@ -141,7 +141,7 @@ describe('makeHttpEventRequest', () => {
         post: {
           lambda: {
             name: 'createUser',
-            params: {}
+            params: {},
           },
           requestBody: {
             content: {
@@ -152,15 +152,15 @@ describe('makeHttpEventRequest', () => {
                     firstName: { type: 'string' },
                     lastName: { type: 'string' },
                     email: { type: 'string' },
-                    dateOfBirth: { type: 'string', format: 'date' }
+                    dateOfBirth: { type: 'string', format: 'date' },
                   },
-                  required: [ 'firstName', 'lastName', 'email', 'dateOfBirth' ]
+                  required: ['firstName', 'lastName', 'email', 'dateOfBirth'],
                 },
-              }
-            }
-          }
-        }
-      }
+              },
+            },
+          },
+        },
+      },
     };
 
     const ret = makeHttpEventRequest(apiSpec['/users'], 'post');
@@ -173,12 +173,12 @@ describe('makeHttpEventRequest', () => {
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             email: { type: 'string' },
-            dateOfBirth: { type: 'string', format: 'date' }
+            dateOfBirth: { type: 'string', format: 'date' },
           },
-          required: [ 'firstName', 'lastName', 'email', 'dateOfBirth' ]
-        }
-      }
-    })
+          required: ['firstName', 'lastName', 'email', 'dateOfBirth'],
+        },
+      },
+    });
   });
 
   test('returns undefined when no parameters and no requestBody', () => {
@@ -187,14 +187,14 @@ describe('makeHttpEventRequest', () => {
         get: {
           lambda: {
             name: 'getUser',
-            params: { authorizer: 'aws_iam' }
+            params: { authorizer: 'aws_iam' },
           },
         },
-      }
+      },
     };
 
     const ret = makeHttpEventRequest(apiSpec['/users'], 'get');
 
     expect(ret).toBeUndefined();
-  })
-})
+  });
+});
