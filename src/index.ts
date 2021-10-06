@@ -20,6 +20,8 @@ class ServerlessAwsOpenapi {
       return;
     }
 
+    const validate = service.custom?.openapi?.validate;
+
     const apiSpec = await apiSpecFrom(specFile);
     const lambdaEvents = lambdaHttpEventsFrom(apiSpec);
     Object.entries(lambdaEvents).forEach(([funcName, events]) => {
@@ -31,6 +33,10 @@ class ServerlessAwsOpenapi {
       func.events = events;
 
       events.forEach((event) => {
+        if (!validate) {
+          event.http.request = undefined;
+          return;
+        }
         const schema = event.http.request?.schemas;
         if (schema) {
           const medias = Object.keys(schema);

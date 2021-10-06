@@ -12,6 +12,7 @@ describe('ServerlessAwsOpenapi', () => {
       custom: {
         openapi: {
           spec: 'dummy.yml',
+          validate: true,
         },
       },
     },
@@ -26,6 +27,7 @@ describe('ServerlessAwsOpenapi', () => {
 
   beforeEach(() => {
     mockServerless.service.functions = {};
+    mockServerless.service.custom.openapi.validate = true;
     mockLambdaHttpEventsFrom.mockClear();
   });
 
@@ -152,6 +154,53 @@ describe('ServerlessAwsOpenapi', () => {
                   },
                 },
               },
+            },
+          },
+        ],
+      },
+    };
+
+    await target.applyApiSpec();
+
+    expect(mockServerless.service.functions).toEqual(expected);
+  });
+
+  test('do not set request when validate is not true', async () => {
+    mockServerless.service.custom.openapi.validate = undefined;
+    mockServerless.service.functions['updateUser'] = {
+      handler: 'update-user',
+      events: [],
+    };
+    const lambdaHttpEvents: ReturnType<typeof lambdaHttpEventsFrom> = {
+      updateUser: [
+        {
+          http: {
+            path: '/user',
+            method: 'post',
+            request: {
+              schemas: {
+                'application/json': {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    };
+    mockLambdaHttpEventsFrom.mockReturnValue(lambdaHttpEvents);
+
+    const expected = {
+      updateUser: {
+        handler: 'update-user',
+        events: [
+          {
+            http: {
+              path: '/user',
+              method: 'post',
             },
           },
         ],
